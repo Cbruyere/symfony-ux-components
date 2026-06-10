@@ -1,0 +1,25 @@
+/.env.local
+/.env.*.local
+/.phpunit.cache
+/.worktrees
+/node_modules/
+/public/build/
+/var/
+/vendor/
+npm-debug.log
+yarn-error.log
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
