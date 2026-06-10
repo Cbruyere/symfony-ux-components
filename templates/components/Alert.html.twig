@@ -1,0 +1,23 @@
+<div
+    class="flex gap-4 rounded-lg border p-4 {{ this.variantClasses }}"
+    role="alert"
+>
+    <div class="flex-shrink-0">
+        {{ ux_icon(this.icon, { class: this.iconClasses }) }}
+    </div>
+
+    <div class="flex-1">
+        <div class="mt-1">
+            {% block content %}
+			<div class="flex-1">
+				{% if title %}
+					<h3 class="font-semibold">{{ title }}</h3>
+				{% endif %}
+				<div class="mt-1">
+					{{ message }}
+				</div>
+			</div>
+			{% endblock %}
+        </div>
+    </div>
+</div>
