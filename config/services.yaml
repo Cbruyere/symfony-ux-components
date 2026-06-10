@@ -1,0 +1,8 @@
+services:
+  ChrisDev\UxComponents\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/ChrisDevUxComponentsBundle.php'
+    autowire: true
+    autoconfigure: true
