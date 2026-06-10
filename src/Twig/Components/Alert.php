@@ -7,7 +7,8 @@ use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 #[AsTwigComponent(
     name: 'Alert',
     template: '@ChrisDevUxComponents/components/Alert.html.twig'
-)]final class Alert
+)]
+final class Alert
 {
     public string $variant = 'info';
     public string $title = '';

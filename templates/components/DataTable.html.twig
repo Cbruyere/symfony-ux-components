@@ -1,0 +1,101 @@
+{# templates/components/DataTable.html.twig #}
+<section {{ attributes.defaults({class: 'overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-2xs', 'data-component': 'data-table', 'data-empty-state': id}) }}>
+	<div class="border-b border-slate-800 px-4 py-4 sm:px-6">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+			<div>
+				<h2 class="text-lg font-semibold text-white">{{ title }}</h2>
+				<p class="mt-1 text-sm text-slate-400">Tableau responsive avec filtres, tri et actions configurables.</p>
+			</div>
+
+			{% if this.getVisibleFilters() is not empty %}
+				<div class="grid gap-3 sm:grid-cols-2 lg:min-w-[24rem]" data-table-filters>
+					{% for filter in this.getVisibleFilters() %}
+						<div>
+							<label class="mb-1.5 block text-xs font-medium uppercase text-slate-400" for="{{ id }}-filter-{{ filter.name }}">{{ filter.label }}</label>
+
+							{% if filter.type == 'select' %}
+								<select id="{{ id }}-filter-{{ filter.name }}" class="{{ this.getFilterClasses(filter) }}" name="{{ filter.name }}" data-model="{{ this.getFilterInputName(filter) }}">
+									<option value="">{{ filter.placeholder }}</option>
+									{% for choice in filter.choices %}
+										<option value="{{ choice }}" {{ filter.value == choice ? 'selected' }}>{{ choice }}</option>
+									{% endfor %}
+								</select>
+							{% endif %}
+
+						</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="-m-1.5 overflow-x-auto">
+		<div class="inline-block min-w-full p-1.5 align-middle">
+			<table class="min-w-full divide-y divide-slate-800">
+				<thead class="bg-slate-950/70">
+					<tr>
+						{% for column in this.getColumns() %}
+							<th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase text-slate-400">
+								{% if column.sortable %}
+									<a href="{{ this.getSortUrl(column) }}" class="inline-flex items-center gap-2 rounded text-slate-300 hover:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Trier par {{ column.label }}">
+										{{ column.label }}
+										{{ ux_icon(this.getSortIcon(column), {class: 'h-3.5 w-3.5'}) }}
+									</a>
+								{% else %}
+									{{ column.label }}
+								{% endif %}
+							</th>
+						{% endfor %}
+
+						{% if this.getActions() is not empty %}
+							<th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase text-slate-400">Actions</th>
+						{% endif %}
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-slate-800">
+					{% for row in this.getVisibleRows() %}
+						<tr class="bg-slate-900 hover:bg-slate-800/60">
+							{% for column in this.getColumns() %}
+								<td class="whitespace-nowrap px-6 py-4 text-sm text-slate-200">{{ this.getCellValue(row, column.key) }}</td>
+							{% endfor %}
+
+							{% if this.getActions() is not empty %}
+								<td class="whitespace-nowrap px-6 py-4 text-end text-sm">
+									<div class="inline-flex items-center gap-2">
+										{% for action in this.getActions() %}
+											<a href="{{ this.getActionUrl(action, row) }}" class="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-500 {{ this.getActionClasses(action) }}" data-table-action="{{ action.name }}">
+												{{ ux_icon(action.icon, {class: 'h-3.5 w-3.5'}) }}
+												{{ action.label }}
+											</a>
+										{% endfor %}
+									</div>
+								</td>
+							{% endif %}
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="{{ this.getColumns()|length + (this.getActions() is not empty ? 1 : 0) }}" class="px-6 py-12">
+								<div class="flex flex-col items-center justify-center text-center">
+									<div class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-slate-400">
+										{{ ux_icon(this.getEmptyState().icon, {class: 'h-5 w-5'}) }}
+									</div>
+									<p class="text-sm font-medium text-slate-100">{{ this.getEmptyState().title }}</p>
+									<p class="mt-1 max-w-md text-sm text-slate-400">{{ this.getEmptyState().message }}</p>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="flex flex-col gap-3 border-t border-slate-800 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+		<p class="text-sm text-slate-400">{{ this.getVisibleRows()|length }} résultat{{ this.getVisibleRows()|length > 1 ? 's' }}</p>
+		<nav class="inline-flex items-center gap-1" aria-label="Pagination">
+			<a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Page précédente">{{ ux_icon('bi:chevron-left', {class: 'h-4 w-4'}) }}</a>
+			<a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-blue-600 bg-blue-600 px-3 text-sm font-medium text-white" aria-current="page">1</a>
+			<a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Page suivante">{{ ux_icon('bi:chevron-right', {class: 'h-4 w-4'}) }}</a>
+		</nav>
+	</div>
+</section>
