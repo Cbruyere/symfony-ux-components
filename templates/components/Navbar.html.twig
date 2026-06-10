@@ -1,0 +1,76 @@
+<nav class="border-b border-slate-800 bg-slate-950/95" data-component="navbar">
+    <div class="mx-auto max-w-6xl px-6">
+        <div class="flex min-h-16 items-center justify-between gap-4">
+            <a class="flex items-center gap-2 font-semibold text-white" href="{{ path(this.brand.route) }}">
+                {{ ux_icon(this.brand.logo, {class: 'size-6 text-emerald-300'}) }}
+                <span>{{ this.brand.label }}</span>
+            </a>
+
+            <button
+                type="button"
+                class="hs-collapse-toggle inline-flex size-10 items-center justify-center rounded-lg border border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-white focus:outline-hidden sm:hidden"
+                data-hs-collapse="#main-navbar"
+                aria-controls="main-navbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                {{ ux_icon('bi:list', {class: 'size-5 hs-collapse-open:hidden'}) }}
+                {{ ux_icon('bi:x-lg', {class: 'hidden size-5 hs-collapse-open:block'}) }}
+            </button>
+
+            <div class="hidden items-center gap-2 sm:flex">
+                {% for item in this.items %}
+                    {% if this.visible(item) %}
+                        <a
+                            class="{{ this.linkClasses(item.route) }}"
+                            href="{{ path(item.route) }}"
+                            {% if this.active(item.route) %}aria-current="page"{% endif %}
+                        >
+                            {{ ux_icon(item.icon, {class: 'size-4'}) }}
+                            <span>{{ item.label }}</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+
+                {% for item in this.userItems %}
+                    <a
+                        class="{{ this.linkClasses(item.route) }}"
+                        href="{{ path(item.route) }}"
+                        {% if this.active(item.route) %}aria-current="page"{% endif %}
+                    >
+                        {{ ux_icon(item.icon, {class: 'size-4'}) }}
+                        <span>{{ item.label }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="main-navbar" class="hs-collapse hidden overflow-hidden transition-all duration-300 sm:hidden">
+            <div class="space-y-1 pb-4">
+                {% for item in this.items %}
+                    {% if this.visible(item) %}
+                        <a
+                            class="{{ this.mobileLinkClasses(item.route) }}"
+                            href="{{ path(item.route) }}"
+                            {% if this.active(item.route) %}aria-current="page"{% endif %}
+                        >
+                            {{ ux_icon(item.icon, {class: 'size-4'}) }}
+                            <span>{{ item.label }}</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+
+                {% for item in this.userItems %}
+                    <a
+                        class="{{ this.mobileLinkClasses(item.route) }}"
+                        href="{{ path(item.route) }}"
+                        {% if this.active(item.route) %}aria-current="page"{% endif %}
+                    >
+                        {{ ux_icon(item.icon, {class: 'size-4'}) }}
+                        <span>{{ item.label }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</nav>
