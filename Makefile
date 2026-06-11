@@ -1,9 +1,25 @@
+UID := $(shell id -u)
+GID := $(shell id -g)
 PHP=docker compose run --rm php
+COMPOSE := UID=$(UID) GID=$(GID) docker compose
+
 
 .PHONY: help install test phpstan lint-twig lint-md npm-build lint-php lint composer-install npm-install composer-require
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
+
+build: ## Build Docker images
+	$(COMPOSE) build
+
+start: ## Start the stack
+	$(COMPOSE) up -d --remove-orphans
+
+stop: ## Stop containers
+	$(COMPOSE) stop
+
+down: ## Stop and remove containers
+	$(COMPOSE) down
 
 install: ## install dependencies
 	$(PHP) composer install
@@ -40,3 +56,30 @@ lint-php: ## Lint PHP files
 
 fix-md: ## Fix all markdown errors
 	$(PHP_RUN) npx prettier --write docs/**/*.md
+
+db-create: ## Create the configured database if missing
+	$(PHP) php demo/bin/console doctrine:database:create --if-not-exists
+
+db-migrate: ## Run Doctrine migrations
+	$(PHP) php demo/bin/console doctrine:migrations:migrate --no-interaction
+
+db-diff: ## Generate a Doctrine migration diff
+	$(PHP) php demo/bin/console doctrine:migrations:diff
+
+db-status: ## Show Doctrine migration status
+	$(PHP) php demo/bin/console doctrine:migrations:status
+
+fixtures: ## Load Doctrine fixtures
+	$(PHP) php demo/bin/console doctrine:fixtures:load --no-interaction
+
+console: ## run symfony console
+	$(PHP) php demo/bin/console
+
+factory: ## Create a new fixture factory
+	$(PHP) php demo/bin/console make:factory
+
+story: ## Create a new fixture story	
+	$(PHP) php demo/bin/console make:story
+
+load-story: ## load fixtures story	
+	$(PHP) php demo/bin/console foundry:load-stories

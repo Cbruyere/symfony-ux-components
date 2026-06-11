@@ -19,10 +19,8 @@ La DataTable v1.0.2 est désormais pleinement fonctionnelle :
 Validation systématique :
 
 ```bash
-make test
 make phpstan
-make lint-twig
-make npm-build
+make lint
 ```
 
 ## Objectif
