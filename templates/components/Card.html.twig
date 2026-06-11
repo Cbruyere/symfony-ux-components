@@ -20,7 +20,7 @@
 
 		{# Content - slot for main content #}
 		<div class="mt-2">
-			{{ content }}
+			{% block content %}{% endblock %}
 		</div>
 
 		{# Button - only render if buttonLabel is provided #}

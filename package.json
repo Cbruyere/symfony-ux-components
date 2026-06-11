@@ -1,0 +1,34 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css --minify && cp ./node_modules/leaflet/dist/leaflet.css ./node_modules/leaflet/dist/leaflet.min.css && esbuild ./assets/app.js --bundle --format=esm --outdir=./public/build/js --loader:.png=file --asset-names=assets/[name]-[hash] --minify",
+    "dev": "tailwindcss -i ./assets/styles/app.css -o ./public/build/app.css --watch",
+    "lint:md": "markdownlint-cli2 \"docs/**/*.md\""
+  },
+  "devDependencies": {
+    "@hotwired/stimulus": "^3.0.0",
+    "@hotwired/turbo": "^7.1.0 || ^8.0",
+    "@iconify-json/bi": "^1.2.7",
+    "@symfony/stimulus-bridge": "^3.2.0 || ^4.0.0",
+    "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets",
+    "@symfony/ux-chartjs": "file:vendor/symfony/ux-chartjs/assets",
+    "@symfony/ux-dropzone": "file:vendor/symfony/ux-dropzone/assets",
+    "@symfony/ux-leaflet-map": "file:vendor/symfony/ux-leaflet-map/assets",
+    "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
+    "@symfony/ux-translator": "file:vendor/symfony/ux-translator/assets",
+    "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
+    "@tailwindcss/cli": "^4.1.0",
+    "chart.js": "^3.4.1 || ^4.0",
+    "esbuild": "^0.28.0",
+    "intl-messageformat": "^10.5.11",
+    "leaflet": "^1.9.4",
+    "markdownlint-cli2": "^0.22.1",
+    "prettier": "^3.8.4",
+    "tailwindcss": "^4.1.0",
+    "tom-select": "^2.2.2"
+  },
+  "dependencies": {
+    "preline": "^4.2.0"
+  }
+}
