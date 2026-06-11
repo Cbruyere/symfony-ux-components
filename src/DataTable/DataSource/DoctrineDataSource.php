@@ -41,8 +41,55 @@ final readonly class DoctrineDataSource implements DataSourceInterface
         $metadata = $entityManager->getClassMetadata($source);
         $this->assertColumnsCanBeMapped($source, $state, $metadata);
 
+        if ($state->paginate) {
+            $totalItems = $this->countItems($entityManager, $source, $state, $metadata);
+            $totalPages = $this->getTotalPages($totalItems, $state->getPerPage());
+            $currentPage = min($state->getPage(), $totalPages);
+        } else {
+            $totalItems = null;
+            $totalPages = 1;
+            $currentPage = 1;
+        }
+
+        $queryBuilder = $this->createBaseQueryBuilder($entityManager, $source, $state, $metadata)
+            ->select('entity');
+
+        if ($state->isSortableColumn($state->sort) && $metadata->hasField($state->sort)) {
+            $queryBuilder->orderBy(sprintf('entity.%s', $state->sort), strtoupper($state->getDirection()));
+        }
+
+        if ($state->paginate) {            
+            $queryBuilder
+                ->setFirstResult(($currentPage - 1) * $state->getPerPage())
+                ->setMaxResults($state->getPerPage());
+        }
+
+        $entities = $queryBuilder->getQuery()->getResult();
+        $rows = array_map(
+            fn (object $entity): array => $this->normalizeEntity($entity, $metadata),
+            array_filter($entities, 'is_object'),
+        );
+        $rows = array_values($rows);
+
+        return new DataTableResult(
+            $rows,
+            $totalItems ?? count($rows),
+            $currentPage,
+            $state->getPerPage(),
+            $totalPages,
+        );
+    }
+
+    /**
+     * @param ClassMetadata<object> $metadata
+     */
+    private function createBaseQueryBuilder(
+        EntityManagerInterface $entityManager,
+        string $source,
+        DataTableState $state,
+        ClassMetadata $metadata,
+    ): \Doctrine\ORM\QueryBuilder {
         $queryBuilder = $entityManager->createQueryBuilder()
-            ->select('entity')
             ->from($source, 'entity');
 
         foreach ($state->filters as $filter) {
@@ -64,17 +111,29 @@ final readonly class DoctrineDataSource implements DataSourceInterface
                 ->setParameter($parameter, $value);
         }
 
-        if ($state->isSortableColumn($state->sort) && $metadata->hasField($state->sort)) {
-            $queryBuilder->orderBy(sprintf('entity.%s', $state->sort), strtoupper($state->getDirection()));
-        }
+        return $queryBuilder;
+    }
 
-        $entities = $queryBuilder->getQuery()->getResult();
-        $rows = array_map(
-            fn (object $entity): array => $this->normalizeEntity($entity, $metadata),
-            array_filter($entities, 'is_object'),
-        );
+    /**
+     * @param ClassMetadata<object> $metadata
+     */
+    private function countItems(
+        EntityManagerInterface $entityManager,
+        string $source,
+        DataTableState $state,
+        ClassMetadata $metadata,
+    ): int {
+        $count = $this->createBaseQueryBuilder($entityManager, $source, $state, $metadata)
+            ->select('COUNT(entity.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        return new DataTableResult(array_values($rows), count($rows));
+        return is_numeric($count) ? (int) $count : 0;
+    }
+
+    private function getTotalPages(int $totalItems, int $perPage): int
+    {
+        return max(1, (int) ceil($totalItems / $perPage));
     }
 
     /**

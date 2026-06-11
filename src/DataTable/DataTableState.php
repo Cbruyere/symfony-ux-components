@@ -17,6 +17,9 @@ final readonly class DataTableState
         public array $filterValues = [],
         public string $sort = '',
         public string $direction = 'asc',
+        public int $page = 1,
+        public int $perPage = 10,
+        public bool $paginate = true,
     ) {
     }
 
@@ -39,5 +42,15 @@ final readonly class DataTableState
     public function getFilterValue(string $name): string
     {
         return (string) ($this->filterValues[$name] ?? '');
+    }
+
+    public function getPage(): int
+    {
+        return max(1, $this->page);
+    }
+
+    public function getPerPage(): int
+    {
+        return max(1, $this->perPage);
     }
 }

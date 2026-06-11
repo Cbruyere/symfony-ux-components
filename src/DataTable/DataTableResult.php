@@ -12,6 +12,9 @@ final readonly class DataTableResult
     public function __construct(
         public array $rows,
         public int $totalItems,
+        public int $currentPage = 1,
+        public int $perPage = 10,
+        public int $totalPages = 1,
     ) {
     }
 }

@@ -1,8 +1,8 @@
-# exemple de prompt AI
+# Tache 015-datatable-pagination
 
 Read AGENTS.md and the requested task file.
 
-task file : docs/014-datatable-data-source-abstraction.md
+task file : docs/015-datatable-pagination.md
 
 Before modifying code:
 

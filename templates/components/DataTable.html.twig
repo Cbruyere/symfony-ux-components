@@ -91,11 +91,39 @@
 	</div>
 
 	<div class="flex flex-col gap-3 border-t border-slate-800 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-		<p class="text-sm text-slate-400">{{ this.getVisibleRows()|length }} résultat{{ this.getVisibleRows()|length > 1 ? 's' }}</p>
+		{% set totalItems = this.getTotalItems() %}
+		{% set currentPage = this.getCurrentPage() %}
+		{% set perPage = this.getPerPage() %}
+		{% set firstItem = totalItems > 0 ? ((currentPage - 1) * perPage) + 1 : 0 %}
+		{% set lastItem = totalItems > 0 ? min(currentPage * perPage, totalItems) : 0 %}
+
+		<p class="text-sm text-slate-400">
+			{% if totalItems > 0 %}
+				{{ firstItem }}-{{ lastItem }} sur {{ totalItems }} résultat{{ totalItems > 1 ? 's' }}
+			{% else %}
+				0 résultat
+			{% endif %}
+		</p>
 		<nav class="inline-flex items-center gap-1" aria-label="Pagination">
-			<a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Page précédente">{{ ux_icon('bi:chevron-left', {class: 'h-4 w-4'}) }}</a>
-			<a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-blue-600 bg-blue-600 px-3 text-sm font-medium text-white" aria-current="page">1</a>
-			<a href="#" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Page suivante">{{ ux_icon('bi:chevron-right', {class: 'h-4 w-4'}) }}</a>
+			{% if this.getPreviousPageUrl() %}
+				<a href="{{ this.getPreviousPageUrl() }}" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Page précédente">{{ ux_icon('bi:chevron-left', {class: 'h-4 w-4'}) }}</a>
+			{% else %}
+				<span class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-slate-600" aria-disabled="true" aria-label="Page précédente">{{ ux_icon('bi:chevron-left', {class: 'h-4 w-4'}) }}</span>
+			{% endif %}
+
+			{% for page in this.getPaginationPages() %}
+				{% if page == currentPage %}
+					<span class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-blue-600 bg-blue-600 px-3 text-sm font-medium text-white" aria-current="page">{{ page }}</span>
+				{% else %}
+					<a href="{{ this.getPageUrl(page) }}" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500">{{ page }}</a>
+				{% endif %}
+			{% endfor %}
+
+			{% if this.getNextPageUrl() %}
+				<a href="{{ this.getNextPageUrl() }}" class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-300 hover:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" aria-label="Page suivante">{{ ux_icon('bi:chevron-right', {class: 'h-4 w-4'}) }}</a>
+			{% else %}
+				<span class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-800 bg-slate-950 px-3 text-sm text-slate-600" aria-disabled="true" aria-label="Page suivante">{{ ux_icon('bi:chevron-right', {class: 'h-4 w-4'}) }}</span>
+			{% endif %}
 		</nav>
 	</div>
 </section>

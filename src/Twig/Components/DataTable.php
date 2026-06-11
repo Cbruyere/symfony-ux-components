@@ -46,6 +46,9 @@ final class DataTable
     #[LiveProp]
     public array $filters = [];
 
+    #[LiveProp]
+    public int $perPage = 10;
+
     /** @var array{title: string, message: string, icon: string} */
     #[LiveProp]
     public array $emptyState = [
@@ -57,6 +60,8 @@ final class DataTable
     /** @var array<string, string> */
     #[LiveProp(writable: true)]
     public array $filterValues = [];
+
+    private ?DataTableResult $result = null;
 
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -81,7 +86,69 @@ final class DataTable
     /** @return list<array<string, mixed>> */
     public function getVisibleRows(): array
     {
-        return $this->fetchRows($this->createState())->rows;
+        return $this->getResult()->rows;
+    }
+
+    public function getResult(): DataTableResult
+    {
+        if (null === $this->result) {
+            $this->result = $this->fetchRows($this->createState());
+        }
+
+        return $this->result;
+    }
+
+    public function getTotalItems(): int
+    {
+        return $this->getResult()->totalItems;
+    }
+
+    public function getCurrentPage(): int
+    {
+        return $this->getResult()->currentPage;
+    }
+
+    public function getPerPage(): int
+    {
+        return $this->getResult()->perPage;
+    }
+
+    public function getTotalPages(): int
+    {
+        return $this->getResult()->totalPages;
+    }
+
+    /** @return list<int> */
+    public function getPaginationPages(): array
+    {
+        return range(1, $this->getTotalPages());
+    }
+
+    public function getPreviousPageUrl(): ?string
+    {
+        if ($this->getCurrentPage() <= 1) {
+            return null;
+        }
+
+        return $this->getPageUrl($this->getCurrentPage() - 1);
+    }
+
+    public function getNextPageUrl(): ?string
+    {
+        if ($this->getCurrentPage() >= $this->getTotalPages()) {
+            return null;
+        }
+
+        return $this->getPageUrl($this->getCurrentPage() + 1);
+    }
+
+    public function getPageUrl(int $page): string
+    {
+        $request = $this->getRequest();
+        $query = $this->getCleanQuery();
+        $query['page'] = max(1, $page);
+
+        return ($request?->getPathInfo() ?? '/home').'?'.http_build_query($query);
     }
 
     /** @return list<array{label: string, route: string, icon: string, variant: string, name: string, params: array<string, string>}> */
@@ -124,6 +191,7 @@ final class DataTable
         $query = $this->getCleanQuery();
         $query['sort'] = $column['key'];
         $query['direction'] = $this->getDirectionForColumn($column);
+        unset($query['page']);
 
         return ($request?->getPathInfo() ?? '/home').'?'.http_build_query($query);
     }
@@ -240,7 +308,7 @@ final class DataTable
         $field = $filter['field'] ?? $filter['name'];
         $choices = [];
 
-        foreach ($this->fetchRows($this->createState(filterValues: [], sort: ''))->rows as $row) {
+        foreach ($this->fetchRows($this->createState(filterValues: [], sort: '', paginate: false))->rows as $row) {
             if (!isset($row[$field]) || !is_scalar($row[$field])) {
                 continue;
             }
@@ -277,7 +345,7 @@ final class DataTable
     }
 
     /** @param array<string, string>|null $filterValues */
-    private function createState(?array $filterValues = null, ?string $sort = null): DataTableState
+    private function createState(?array $filterValues = null, ?string $sort = null, bool $paginate = true): DataTableState
     {
         return new DataTableState(
             columns: $this->getColumns(),
@@ -285,6 +353,9 @@ final class DataTable
             filterValues: $filterValues ?? $this->filterValues,
             sort: $sort ?? $this->getCurrentSort(),
             direction: $this->getCurrentDirection(),
+            page: $this->getCurrentPageFromRequest(),
+            perPage: $this->perPage,
+            paginate: $paginate,
         );
     }
 
@@ -293,5 +364,16 @@ final class DataTable
         $source = null === $this->source ? $this->rows : $this->source;
 
         return $this->dataSourceResolver->resolve($source)->fetch($source, $state);
+    }
+
+    private function getCurrentPageFromRequest(): int
+    {
+        $page = $this->getQueryValue('page');
+
+        if (!ctype_digit($page)) {
+            return 1;
+        }
+
+        return max(1, (int) $page);
     }
 }

@@ -23,8 +23,18 @@ final class ArrayDataSource implements DataSourceInterface
         $rows = $this->normalizeRows($source);
         $rows = $this->applyFilters($rows, $state);
         $rows = $this->applySorting($rows, $state);
+        $totalItems = count($rows);
 
-        return new DataTableResult($rows, count($rows));
+        if (!$state->paginate) {
+            return new DataTableResult($rows, $totalItems, 1, $state->getPerPage(), 1);
+        }
+
+        $totalPages = $this->getTotalPages($totalItems, $state->getPerPage());
+        $currentPage = min($state->getPage(), $totalPages);
+        $offset = ($currentPage - 1) * $state->getPerPage();
+        $rows = array_slice($rows, $offset, $state->getPerPage());
+
+        return new DataTableResult($rows, $totalItems, $currentPage, $state->getPerPage(), $totalPages);
     }
 
     /**
@@ -104,5 +114,10 @@ final class ArrayDataSource implements DataSourceInterface
         }
 
         return '';
+    }
+
+    private function getTotalPages(int $totalItems, int $perPage): int
+    {
+        return max(1, (int) ceil($totalItems / $perPage));
     }
 }
