@@ -131,6 +131,12 @@ Tests must prepare their own data.
 
 # Fixtures
 
+"zenstruck/foundry" is already available, use only Factories and Stories to create fixtures
+
+Never use anything else for fixtures
+
+doctrine/doctrine-fixtures-bundle is forbidden
+
 Fixtures should be reusable.
 
 Fixtures must remain generic.
@@ -152,56 +158,6 @@ InvoiceFixture
 ProductFixture
 ```
 
----
-
-# Test User Creation
-
-User creation should be centralized.
-
-Expected helper:
-
-```php
-protected function createUser(
-    string $email = 'user@example.com'
-): User
-```
-
-Purpose:
-
-Avoid duplicate setup code.
-
----
-
-# Authenticated Client
-
-Authentication should be centralized.
-
-Expected helper:
-
-```php
-protected function createAuthenticatedClient(): KernelBrowser
-```
-
-Purpose:
-
-Avoid repetitive login code.
-
----
-
-# Login Helper
-
-Expected helper:
-
-```php
-protected function loginUser(
-    User $user
-): KernelBrowser
-```
-
-All tests should reuse this method.
-
----
-
 # Refresh Database
 
 Expected helper:
@@ -215,22 +171,6 @@ Purpose:
 Reset database state between tests.
 
 Implementation may vary depending on future tooling.
-
----
-
-# Static Factory Methods
-
-Common factories should be preferred.
-
-Example:
-
-```php
-UserFactory::create();
-```
-
-Avoid duplicating entity initialization.
-
----
 
 # Naming Conventions
 
@@ -277,104 +217,6 @@ Bad:
 self::assertTrue(true);
 ```
 
----
-
-# Home Page Tests
-
-Minimum coverage:
-
-## Home Accessible
-
-```text
-GET /home
-```
-
-Expected:
-
-```text
-200 OK
-```
-
----
-
-## Home Content
-
-Verify presence of:
-
-- cards
-- navigation
-- example components
-
----
-
-# Login Tests
-
-Minimum coverage:
-
-## Login Page Accessible
-
-```text
-GET /login
-```
-
-Expected:
-
-```text
-200 OK
-```
-
----
-
-## Login Success
-
-Expected:
-
-- authentication success
-- redirect
-
----
-
-## Login Failure
-
-Expected:
-
-- authentication error
-- form displayed again
-
----
-
-# Account Tests
-
-Minimum coverage:
-
-## Anonymous User
-
-```text
-GET /account
-```
-
-Expected:
-
-```text
-redirect to login
-```
-
----
-
-## Authenticated User
-
-```text
-GET /account
-```
-
-Expected:
-
-```text
-200 OK
-```
-
----
-
 # Component Tests
 
 Reusable components should be tested when behavior exists.
@@ -419,30 +261,6 @@ Upload features should verify:
 - upload success
 - validation errors
 - invalid file handling
-
----
-
-# Security
-
-Security tests are mandatory.
-
-Verify:
-
-- anonymous access
-- authenticated access
-- role restrictions
-
----
-
-# API Platform
-
-Verify:
-
-- CRUD availability
-- response codes
-- serialization
-
-Do not introduce business API tests in the starter.
 
 ---
 
@@ -534,9 +352,6 @@ Before considering a feature complete:
 
 - PHPUnit passes
 - Functional tests pass
-- Security tested
-- Anonymous access tested
-- Authenticated access tested
 - No duplicated test setup
 - AbstractWebTestCase reused
 

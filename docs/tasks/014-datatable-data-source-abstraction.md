@@ -4,23 +4,24 @@
 
 La DataTable v1.0.2 est désormais pleinement fonctionnelle :
 
-- colonnes dynamiques
-- lignes dynamiques
-- actions dynamiques
-- tri dynamique
-- filtres dynamiques
-- autoChoices
-- multi-filtres
-- LiveComponent
-- responsive
-- dark mode
-- couverture de tests complète
+* colonnes dynamiques
+* lignes dynamiques
+* actions dynamiques
+* tri dynamique
+* filtres dynamiques
+* autoChoices
+* multi-filtres
+* LiveComponent
+* responsive
+* dark mode
+* couverture de tests complète
 
 Validation systématique :
 
 ```bash
 make phpstan
 make lint
+make tests
 ```
 
 ## Objectif
@@ -43,14 +44,39 @@ tout en conservant une compatibilité complète avec :
 'rows' => [...]
 ```
 
+## Environnement de test
+
+Un environnement de test est présent dans le dossier `demo`.
+
+Il s'agit d'une installation Symfony minimale utilisée uniquement pour valider les composants.
+
+Tout ce qui ne concerne pas directement le composant doit se trouver dans `demo` :
+
+* entities
+* factories
+* stories
+* fixtures
+* migrations
+* repositories
+* données de démonstration
+
+Il existe un `HomeController` qui renvoie la page de démonstration.
+
+La validation visuelle devra être effectuée uniquement via :
+
+```text
+demo/templates/demo/index.html.twig
+```
+
+Aucun élément spécifique à la démonstration ne doit être ajouté dans le package principal.
+
 ## Principes d'architecture
 
 ### Important
 
 La DataTable ne doit jamais dépendre directement de Doctrine.
 
-L'objectif est d'introduire un mécanisme extensible permettant de supporter plusieurs sources de
-données sans modifier le composant principal.
+L'objectif est d'introduire un mécanisme extensible permettant de supporter plusieurs sources de données sans modifier le composant principal.
 
 Architecture cible :
 
@@ -66,6 +92,18 @@ DataSourceInterface
     ├── DoctrineDataSource
     └── FutureDataSources
 ```
+
+### Isolation Doctrine
+
+Le composant DataTable ne doit contenir :
+
+* aucun appel direct à Doctrine
+* aucun `EntityManagerInterface`
+* aucun `Repository`
+* aucun `QueryBuilder`
+* aucune dépendance forte à une entité
+
+Le support Doctrine doit être isolé dans une datasource dédiée.
 
 ## Interface
 
@@ -123,11 +161,39 @@ ou
 
 Responsabilités :
 
-- lecture des données
-- application des filtres
-- application du tri
-- pagination éventuelle
-- retour d'un DataTableResult
+* lecture des données
+* application des filtres
+* application du tri
+* pagination éventuelle
+* retour d'un `DataTableResult`
+
+## Compatibilité ascendante
+
+Le fonctionnement actuel doit rester totalement opérationnel.
+
+Les configurations existantes :
+
+```php
+[
+    'rows' => [...],
+]
+```
+
+ne doivent pas être cassées.
+
+### Normalisation
+
+`rows` doit être considéré comme un alias de compatibilité de :
+
+```php
+[
+    'source' => [...]
+]
+```
+
+Une phase de transition doit être prévue.
+
+Le composant doit continuer à accepter les deux syntaxes.
 
 ## DoctrineDataSource
 
@@ -145,40 +211,47 @@ Exemple :
 
 Responsabilités :
 
-- récupération du repository
-- construction du QueryBuilder
-- application des filtres
-- application du tri
-- récupération des résultats
-- transformation vers DataTableResult
+* récupération du repository
+* construction du QueryBuilder
+* application des filtres
+* application du tri
+* récupération des résultats
+* transformation vers `DataTableResult`
 
-## Compatibilité ascendante
+## Mapping des colonnes Doctrine
 
-Le fonctionnement actuel doit rester totalement opérationnel.
-
-Les configurations existantes :
+Lorsque la source est une entité Doctrine :
 
 ```php
 [
-    'rows' => [...],
+    'source' => User::class,
 ]
 ```
 
-ne doivent pas être cassées.
+les colonnes doivent correspondre à des propriétés réellement disponibles sur l'entité.
 
-Une phase de transition doit être prévue.
+Si une colonne ne peut pas être résolue, une erreur explicite doit être levée.
+
+Exemple :
+
+```text
+Column "status" cannot be mapped on entity App\Entity\User.
+Use a computed column/value callback or expose a real property.
+```
+
+L'objectif est d'éviter les erreurs silencieuses et de faciliter le débogage.
 
 ## Hors périmètre
 
 Ne pas implémenter dans cette tâche :
 
-- export CSV
-- export XLSX
-- import de données
-- attributs PHP
-- serializer groups
-- générateur CRUD
-- fonctionnalités de type EasyAdmin
+* export CSV
+* export XLSX
+* import de données
+* attributs PHP
+* serializer groups
+* générateur CRUD
+* fonctionnalités de type EasyAdmin
 
 Ces sujets seront traités dans des tâches ultérieures.
 
@@ -186,7 +259,7 @@ Ces sujets seront traités dans des tâches ultérieures.
 
 Une fois cette abstraction en place, il sera possible d'ajouter facilement :
 
-```php
+```text
 ApiDataSource
 ElasticDataSource
 CsvDataSource
@@ -200,7 +273,7 @@ sans modifier le composant DataTable.
 Tous les contrôles qualité doivent rester verts :
 
 ```bash
-make test
+make tests
 make phpstan
 make lint-twig
 make npm-build
@@ -208,20 +281,27 @@ make npm-build
 
 ## Critères d'acceptation
 
-- DataTable fonctionnelle avec `rows`
-- DataTable fonctionnelle avec `source`
-- Resolver opérationnel
-- ArrayDataSource implémentée
-- DoctrineDataSource implémentée
-- Aucun couplage direct entre DataTable et Doctrine
-- Couverture de tests maintenue
-- PHPStan niveau actuel conservé
-- Aucune régression fonctionnelle
+* DataTable fonctionnelle avec `rows`
+* DataTable fonctionnelle avec `source`
+* Resolver opérationnel
+* ArrayDataSource implémentée
+* DoctrineDataSource implémentée
+* Compatibilité complète avec `rows`
+* Aucun couplage direct entre DataTable et Doctrine
+* Support Doctrine isolé dans une datasource dédiée
+* Couverture de tests maintenue
+* PHPStan niveau actuel conservé
+* Aucune régression fonctionnelle
 
 ## Note d'architecture
 
 Cette tâche n'a pas pour objectif d'ajouter une fonctionnalité visible.
 
-Son objectif est de supprimer le dernier couplage fort du composant DataTable afin de garantir son
-extensibilité future tout en conservant sa philosophie actuelle : un composant UX autonome, léger et
-réutilisable.
+Son objectif est de supprimer le dernier couplage fort du composant DataTable afin de garantir son extensibilité future tout en conservant sa philosophie actuelle :
+
+* composant UX autonome
+* composant léger
+* composant réutilisable
+* architecture extensible basée sur des DataSources
+
+Cette abstraction constitue la fondation permettant d'introduire ultérieurement de nouvelles sources de données sans modifier le cœur du composant.

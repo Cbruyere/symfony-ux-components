@@ -1,7 +1,8 @@
 UID := $(shell id -u)
 GID := $(shell id -g)
-PHP=docker compose run --rm php
 COMPOSE := UID=$(UID) GID=$(GID) docker compose
+PHP := $(COMPOSE) exec php
+PHP_RUN := $(COMPOSE) run --rm php_run
 
 
 .PHONY: help install test phpstan lint-twig lint-md npm-build lint-php lint composer-install npm-install composer-require
@@ -37,49 +38,49 @@ npm-install: ## Run npm install
 npm-build: ## run npm build
 	$(PHP) npm run build
 
-test: ## run all tests
-	$(PHP) vendor/bin/phpunit
+tests: ## run all tests
+	$(PHP_RUN) vendor/bin/phpunit
 
 phpstan: ## Run phpstan
-	$(PHP) vendor/bin/phpstan analyse
+	$(PHP_RUN) vendor/bin/phpstan analyse
 
 lint: lint-php lint-twig ## Run all coding linters
 
 lint-twig: ## twig linter
-	$(PHP) php demo/bin/console lint:twig templates
+	$(PHP_RUN) php demo/bin/console lint:twig templates
 
 lint-md: ## markdown linter
-	$(PHP) npm run lint:md
+	$(PHP_RUN) npm run lint:md
 
 lint-php: ## Lint PHP files
-	$(PHP) find src tests public config -name '*.php' -print0 | xargs -0 -r php -l
+	$(PHP_RUN) find src tests config -name '*.php' -print0 | xargs -0 -r php -l
 
 fix-md: ## Fix all markdown errors
 	$(PHP_RUN) npx prettier --write docs/**/*.md
 
 db-create: ## Create the configured database if missing
-	$(PHP) php demo/bin/console doctrine:database:create --if-not-exists
+	$(PHP) php bin/console doctrine:database:create --if-not-exists
 
 db-migrate: ## Run Doctrine migrations
-	$(PHP) php demo/bin/console doctrine:migrations:migrate --no-interaction
+	$(PHP) php bin/console doctrine:migrations:migrate --no-interaction
 
 db-diff: ## Generate a Doctrine migration diff
-	$(PHP) php demo/bin/console doctrine:migrations:diff
+	$(PHP) php bin/console doctrine:migrations:diff
 
 db-status: ## Show Doctrine migration status
-	$(PHP) php demo/bin/console doctrine:migrations:status
+	$(PHP) php bin/console doctrine:migrations:status
 
 fixtures: ## Load Doctrine fixtures
-	$(PHP) php demo/bin/console doctrine:fixtures:load --no-interaction
+	$(PHP) php bin/console doctrine:fixtures:load --no-interaction
 
 console: ## run symfony console
-	$(PHP) php demo/bin/console
+	$(PHP) php bin/console
 
 factory: ## Create a new fixture factory
-	$(PHP) php demo/bin/console make:factory
+	$(PHP) php bin/console make:factory
 
 story: ## Create a new fixture story	
-	$(PHP) php demo/bin/console make:story
+	$(PHP) php bin/console make:story
 
 load-story: ## load fixtures story	
-	$(PHP) php demo/bin/console foundry:load-stories
+	$(PHP) php bin/console foundry:load-stories
