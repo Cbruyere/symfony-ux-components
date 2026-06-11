@@ -2,6 +2,9 @@
 
 namespace ChrisDev\UxComponents\Twig\Components;
 
+use ChrisDev\UxComponents\DataTable\DataSource\DataSourceResolver;
+use ChrisDev\UxComponents\DataTable\DataTableResult;
+use ChrisDev\UxComponents\DataTable\DataTableState;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,6 +35,9 @@ final class DataTable
     #[LiveProp]
     public array $rows = [];
 
+    #[LiveProp]
+    public mixed $source = null;
+
     /** @var list<array{label: string, route: string, icon?: string, variant?: string, name?: string, params?: array<string, string>}> */
     #[LiveProp]
     public array $actions = [];
@@ -55,6 +61,7 @@ final class DataTable
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly DataSourceResolver $dataSourceResolver,
     ) {
     }
 
@@ -74,10 +81,7 @@ final class DataTable
     /** @return list<array<string, mixed>> */
     public function getVisibleRows(): array
     {
-        $rows = $this->rows;
-        $rows = $this->applyFilters($rows);
-
-        return $this->applySorting($rows);
+        return $this->fetchRows($this->createState())->rows;
     }
 
     /** @return list<array{label: string, route: string, icon: string, variant: string, name: string, params: array<string, string>}> */
@@ -236,7 +240,7 @@ final class DataTable
         $field = $filter['field'] ?? $filter['name'];
         $choices = [];
 
-        foreach ($this->rows as $row) {
+        foreach ($this->fetchRows($this->createState(filterValues: [], sort: ''))->rows as $row) {
             if (!isset($row[$field]) || !is_scalar($row[$field])) {
                 continue;
             }
@@ -272,61 +276,22 @@ final class DataTable
         return $query;
     }
 
-    /**
-     * @param list<array<string, mixed>> $rows
-     * @return list<array<string, mixed>>
-     */
-    private function applyFilters(array $rows): array
+    /** @param array<string, string>|null $filterValues */
+    private function createState(?array $filterValues = null, ?string $sort = null): DataTableState
     {
-        foreach ($this->getVisibleFilters() as $filter) {
-            if ('' === $filter['value']) {
-                continue;
-            }
-
-            $rows = array_values(array_filter(
-                $rows,
-                fn (array $row): bool => $this->rowMatchesFilter($row, $filter['field'], $filter['value'], $filter['type']),
-            ));
-        }
-
-        return $rows;
+        return new DataTableState(
+            columns: $this->getColumns(),
+            filters: $this->filters,
+            filterValues: $filterValues ?? $this->filterValues,
+            sort: $sort ?? $this->getCurrentSort(),
+            direction: $this->getCurrentDirection(),
+        );
     }
 
-    /** @param array<string, mixed> $row */
-    private function rowMatchesFilter(array $row, string $field, string $value, string $type): bool
+    private function fetchRows(DataTableState $state): DataTableResult
     {
-        return 'select' === $type && isset($row[$field]) && is_scalar($row[$field]) && (string) $row[$field] === $value;
-    }
+        $source = null === $this->source ? $this->rows : $this->source;
 
-    /**
-     * @param list<array<string, mixed>> $rows
-     * @return list<array<string, mixed>>
-     */
-    private function applySorting(array $rows): array
-    {
-        $sort = $this->getCurrentSort();
-
-        if (!$this->isSortableColumn($sort)) {
-            return $rows;
-        }
-
-        usort($rows, function (array $left, array $right) use ($sort): int {
-            $comparison = strnatcasecmp($this->getCellValue($left, $sort), $this->getCellValue($right, $sort));
-
-            return 'desc' === $this->getCurrentDirection() ? -$comparison : $comparison;
-        });
-
-        return $rows;
-    }
-
-    private function isSortableColumn(string $key): bool
-    {
-        foreach ($this->getColumns() as $column) {
-            if ($column['key'] === $key && $column['sortable']) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->dataSourceResolver->resolve($source)->fetch($source, $state);
     }
 }

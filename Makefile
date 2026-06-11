@@ -5,7 +5,7 @@ PHP := $(COMPOSE) exec php
 PHP_RUN := $(COMPOSE) run --rm php_run
 
 
-.PHONY: help install test phpstan lint-twig lint-md npm-build lint-php lint composer-install npm-install composer-require
+.PHONY: help install tests phpstan lint-twig lint-md npm-build lint-php lint composer-install npm-install composer-require
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
