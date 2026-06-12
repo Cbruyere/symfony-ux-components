@@ -20,17 +20,21 @@ final readonly class DoctrineDataSource implements DataSourceInterface
 
     public function supports(mixed $source): bool
     {
-        return is_string($source)
-            && class_exists($source)
-            && null !== $this->managerRegistry->getManagerForClass($source);
+        if (!is_string($source) || !class_exists($source)) {
+            return false;
+        }
+
+        /** @var class-string $source */
+        return null !== $this->managerRegistry->getManagerForClass($source);
     }
 
     public function fetch(mixed $source, DataTableState $state): DataTableResult
     {
-        if (!is_string($source)) {
+        if (!is_string($source) || !class_exists($source)) {
             return new DataTableResult([], 0);
         }
 
+        /** @var class-string $source */
         $entityManager = $this->managerRegistry->getManagerForClass($source);
 
         if (!$entityManager instanceof EntityManagerInterface) {
@@ -64,12 +68,16 @@ final readonly class DoctrineDataSource implements DataSourceInterface
                 ->setMaxResults($state->getPerPage());
         }
 
-        $entities = $queryBuilder->getQuery()->getResult();
-        $rows = array_map(
-            fn (object $entity): array => $this->normalizeEntity($entity, $metadata),
-            array_filter($entities, 'is_object'),
-        );
-        $rows = array_values($rows);
+        $result = $queryBuilder->getQuery()->getResult();
+        $rows = [];
+
+        if (is_array($result)) {
+            foreach ($result as $entity) {
+                if (is_object($entity)) {
+                    $rows[] = $this->normalizeEntity($entity, $metadata);
+                }
+            }
+        }
 
         return new DataTableResult(
             $rows,
@@ -82,6 +90,7 @@ final readonly class DoctrineDataSource implements DataSourceInterface
 
     /**
      * @param ClassMetadata<object> $metadata
+     * @param class-string $source
      */
     private function createBaseQueryBuilder(
         EntityManagerInterface $entityManager,
@@ -116,6 +125,7 @@ final readonly class DoctrineDataSource implements DataSourceInterface
 
     /**
      * @param ClassMetadata<object> $metadata
+     * @param class-string $source
      */
     private function countItems(
         EntityManagerInterface $entityManager,

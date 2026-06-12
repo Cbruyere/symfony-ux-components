@@ -46,9 +46,19 @@ final class ArrayDataSource implements DataSourceInterface
         $rows = [];
 
         foreach ($source as $row) {
-            if (is_array($row)) {
-                $rows[] = $row;
+            if (!is_array($row)) {
+                continue;
             }
+
+            $normalizedRow = [];
+
+            foreach ($row as $key => $value) {
+                if (is_string($key)) {
+                    $normalizedRow[$key] = $value;
+                }
+            }
+
+            $rows[] = $normalizedRow;
         }
 
         return $rows;

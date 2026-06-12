@@ -109,7 +109,9 @@ final class Navbar
 
     private function getCurrentRoute(): ?string
     {
-        return $this->requestStack->getCurrentRequest()?->attributes->get('_route');
+        $route = $this->requestStack->getCurrentRequest()?->attributes->get('_route');
+
+        return is_string($route) ? $route : null;
     }
 
     private function isAuthenticated(): bool
