@@ -35,7 +35,11 @@ final class ClassDiagramExtractor
                 continue;
             }
 
-            $kind = strtolower((string) token_name($token[0]));
+            if (!is_array($token)) {
+                continue;
+            }
+
+            $kind = strtolower(token_name($token[0]));
             $kind = str_replace('t_', '', $kind);
             $fullName = $namespace === '' ? $className : $namespace . '\\' . $className;
             $headerEnd = $this->findNextChar($tokens, $index, '{');
@@ -359,7 +363,7 @@ final class ClassDiagramExtractor
     private function extractMethodParameter(array $tokens): ?array
     {
         foreach ($tokens as $index => $token) {
-            if (!is_array($token) || $token[0] !== T_VARIABLE) {
+            if (!is_array($token) || $token[0] !== T_VARIABLE || !is_string($token[1])) {
                 continue;
             }
 
@@ -450,7 +454,7 @@ final class ClassDiagramExtractor
         }
 
         foreach ($tokens as $index => $token) {
-            if (!is_array($token) || $token[0] !== T_VARIABLE) {
+            if (!is_array($token) || $token[0] !== T_VARIABLE || !is_string($token[1])) {
                 continue;
             }
 
@@ -471,7 +475,7 @@ final class ClassDiagramExtractor
     private function extractProperty(array $statement): ?array
     {
         foreach ($statement as $index => $token) {
-            if (!is_array($token) || $token[0] !== T_VARIABLE) {
+            if (!is_array($token) || $token[0] !== T_VARIABLE || !is_string($token[1])) {
                 continue;
             }
 
@@ -526,6 +530,7 @@ final class ClassDiagramExtractor
      */
     private function extractPropertyType(array $tokens): ?string
     {
+        /** @var list<string> $parts */
         $parts = [];
 
         foreach ($tokens as $token) {
@@ -539,6 +544,10 @@ final class ClassDiagramExtractor
             }
 
             $value = is_array($token) ? $token[1] : $token;
+
+            if (!is_string($value)) {
+                continue;
+            }
 
             if ($value === '?') {
                 continue;
@@ -557,6 +566,7 @@ final class ClassDiagramExtractor
      */
     private function extractReturnType(array $tokens, int $start): ?string
     {
+        /** @var list<string> $parts */
         $parts = [];
         $typeStarted = false;
 
@@ -581,6 +591,10 @@ final class ClassDiagramExtractor
             }
 
             $value = is_array($token) ? $token[1] : $token;
+
+            if (!is_string($value)) {
+                continue;
+            }
 
             if ($value === '?') {
                 continue;
@@ -637,7 +651,7 @@ final class ClassDiagramExtractor
                 continue;
             }
 
-            if (is_array($token) && in_array($token[0], $acceptedTypes, true)) {
+            if (is_array($token) && in_array($token[0], $acceptedTypes, true) && is_string($token[1])) {
                 return $token[1];
             }
         }
@@ -650,6 +664,7 @@ final class ClassDiagramExtractor
      */
     private function collectName(array $tokens, int $start): string
     {
+        /** @var list<string> $parts */
         $parts = [];
 
         for ($index = $start; $index < count($tokens); ++$index) {
@@ -668,7 +683,7 @@ final class ClassDiagramExtractor
                 continue;
             }
 
-            if (is_array($token) && in_array($token[0], [T_STRING, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NS_SEPARATOR], true)) {
+            if (is_array($token) && in_array($token[0], [T_STRING, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NS_SEPARATOR], true) && is_string($token[1])) {
                 $parts[] = $token[1];
                 continue;
             }
@@ -688,6 +703,7 @@ final class ClassDiagramExtractor
     private function collectNameList(array $tokens, int $start): array
     {
         $names = [];
+        /** @var list<string> $parts */
         $parts = [];
 
         for ($index = $start; $index < count($tokens); ++$index) {
@@ -717,7 +733,7 @@ final class ClassDiagramExtractor
                 continue;
             }
 
-            if (is_array($token) && in_array($token[0], [T_STRING, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NS_SEPARATOR], true)) {
+            if (is_array($token) && in_array($token[0], [T_STRING, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NS_SEPARATOR], true) && is_string($token[1])) {
                 $parts[] = $token[1];
             }
         }

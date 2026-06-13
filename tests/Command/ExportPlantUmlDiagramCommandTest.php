@@ -558,6 +558,10 @@ PHP);
         );
 
         foreach ($files as $file) {
+            if (!$file instanceof \SplFileInfo) {
+                continue;
+            }
+
             if ($file->isDir()) {
                 rmdir($file->getPathname());
 
