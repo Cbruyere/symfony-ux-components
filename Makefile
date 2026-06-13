@@ -42,7 +42,7 @@ tests: ## run all tests
 	$(PHP_RUN) vendor/bin/phpunit
 
 phpstan: ## Run phpstan
-	$(PHP_RUN) vendor/bin/phpstan analyse
+	$(PHP_RUN) vendor/bin/phpstan analyse --memory-limit=512M
 
 lint: lint-php lint-twig ## Run all coding linters
 
