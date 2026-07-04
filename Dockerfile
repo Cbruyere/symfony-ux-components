@@ -58,6 +58,7 @@ ENV APP_DEBUG=0
 
 RUN cd demo \
     && composer dump-autoload --classmap-authoritative --no-dev \
+    && php bin/console importmap:install --env=prod \
     && php bin/console asset-map:compile --env=prod \
     && php bin/console cache:clear --env=prod --no-debug \
     && php bin/console cache:warmup --env=prod --no-debug
