@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "build": "php bin/console asset-map:compile"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@symfony/ux-leaflet-map": "^3.1.0",
+    "@symfony/ux-live-component": "^3.1.0",
+    "preline": "^4.2.0"
+  }
+}

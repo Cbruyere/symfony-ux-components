@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Exemples Symfony UX
+{% endblock %}
+
+{% block body %}
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 py-8 lg:grid-cols-[1.15fr_0.85fr]">
+		<div class="space-y-5">
+			<p class="text-sm font-medium uppercase text-emerald-300">Symfony UX</p>
+			<h1 class="text-4xl font-semibold text-white">Exemples Symfony UX</h1>
+			<p class="max-w-2xl text-zinc-300">
+				Une base authentifiee avec composants UX, Tailwind, upload et cartes de demonstration.
+			</p>
+		</div>
+
+		<div class="grid gap-3 sm:grid-cols-2">
+			{% for item in [
+                {label: 'Live Component', value: 'Interactions serveur'},
+                {label: 'Chart.js', value: 'Graphiques prets'},
+                {label: 'Dropzone', value: 'Upload ergonomique'},
+                {label: 'Twig Components', value: 'UI reutilisable'}
+            ] %}
+				<article class="rounded border border-zinc-800 bg-zinc-900 p-4">
+					<p class="text-sm text-zinc-400">{{ item.label }}</p>
+					<p class="mt-2 font-medium text-white">{{ item.value }}</p>
+				</article>
+			{% endfor %}
+		</div>
+	</section>
+
+	{# Carousel Component Demonstration #}
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12">
+		<h2 class="text-2xl font-semibold text-white">Composant Carousel</h2>
+		<twig:UxCarousel
+			:items="carouselItems"
+			id="home-demo-carousel"
+			:withControls="true"
+			:withIndicators="true"
+		/>
+	</section>
+
+	{# DataTable Component Demonstration #}
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12">
+		<h2 class="text-2xl font-semibold text-white">Composant DataTable</h2>
+		<twig:UxDataTable
+			id="users"
+			title="Utilisateurs de démonstration"
+			:columns="userTable.columns"
+			:source="userTable.source"
+			:actions="userTable.actions"
+			:filters="userTable.filters"
+			:perPage="userTable.perPage"
+		/>
+		<twig:UxDataTable
+			id="demo"
+			title="Table vide de démonstration"
+			:columns="emptyTable.columns"
+			:rows="emptyTable.rows"
+			:actions="emptyTable.actions"
+			:filters="emptyTable.filters"
+			:perPage="emptyTable.perPage"
+		/>
+	</section>
+
+	{# Badge Component Demonstration #}
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12">
+		<h2 class="text-2xl font-semibold text-white">Composant Badge</h2>
+		<div class="flex flex-wrap gap-2">
+			{% for badge in badges %}
+				<twig:UxBadge
+					variant="{{ badge.variant }}"
+					label="{{ badge.label }}"
+				></twig:UxBadge>
+			{% endfor %}
+		</div>
+	</section>
+
+	{# Alert Component Demonstration #}
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12">
+		<h2 class="text-2xl font-semibold text-white">Composant Alert</h2>
+		<div class="space-y-4">
+			{% for alert in alerts %}
+				<twig:UxAlert
+					variant="{{ alert.variant }}"
+					title="{{ alert.title }}"
+					message="{{ alert.message }}"
+			></twig:UxAlert>
+			{% endfor %}
+		</div>
+	</section>
+
+	{# Card Component Demonstration #}
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12">
+		<h2 class="text-2xl font-semibold text-white">Composant Card</h2>
+		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+			<twig:UxCard image="https://images.unsplash.com/photo-1680868543815-b8666dba60f7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=320&q=80" title="Symfony UX Starter Kit" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed interdum mauris. Mécène augue ex, ultrices id elementum id, consectetur sed justo. Aliquam est nibh." buttonLabel="En savoir plus" buttonAction="#"></twig:UxCard>
+
+			<twig:UxCard image="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=320&q=80" title="Twig Components" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed interdum mauris. Mécène augue ex, ultrices id elementum id, consectetur sed justo. Aliquam est nibh." buttonLabel="Voir la documentation" buttonAction="#"></twig:UxCard>
+
+			<twig:UxCard image="https://images.unsplash.com/photo-1618477388954-7852f32655ec?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=320&q=80" title="Preline UI" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed interdum mauris. Mécène augue ex, ultrices id elementum id, consectetur sed justo. Aliquam est nibh." buttonLabel="Explorer" buttonAction="#"></twig:UxCard>
+		</div>
+	</section>
+
+	<section class="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12 lg:grid-cols-3">
+		<article class="rounded border border-zinc-800 bg-zinc-900 p-5">
+			<h2 class="text-lg font-semibold text-white">Liste UX</h2>
+			<ul class="mt-4 space-y-3 text-sm text-zinc-300">
+				<li class="flex items-center gap-2">{{ ux_icon('bi:check-circle') }}
+					Twig Component</li>
+				<li class="flex items-center gap-2">{{ ux_icon('bi:check-circle') }}
+					Live Component</li>
+				<li class="flex items-center gap-2">{{ ux_icon('bi:check-circle') }}
+					UX Translator</li>
+			</ul>
+		</article>
+
+		<article class="rounded border border-zinc-800 bg-zinc-900 p-5">
+			<h2 class="text-lg font-semibold text-white">File upload</h2>
+			<label class="mt-4 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-zinc-700 bg-zinc-950 px-4 py-6 text-center text-sm text-zinc-300">
+				{{ ux_icon('bi:cloud-arrow-up', {class: 'mb-2 h-7 w-7 text-emerald-300'}) }}
+				Deposer un fichier
+				<input class="sr-only" data-controller="symfony--ux-dropzone--dropzone" type="file">
+			</label>
+		</article>
+	</section>
+{% endblock %}

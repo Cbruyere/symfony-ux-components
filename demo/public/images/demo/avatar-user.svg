@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Avatar utilisateur de demonstration</title>
+  <desc id="desc">Portrait graphique generique utilise pour les donnees de demonstration.</desc>
+  <defs>
+    <linearGradient id="background" x1="36" y1="24" x2="220" y2="232" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f766e"/>
+      <stop offset="0.52" stop-color="#1d4ed8"/>
+      <stop offset="1" stop-color="#4338ca"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="72" y1="166" x2="184" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#164e63"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="128" fill="url(#background)"/>
+  <circle cx="72" cy="68" r="34" fill="#67e8f9" opacity="0.18"/>
+  <circle cx="202" cy="76" r="46" fill="#a5b4fc" opacity="0.16"/>
+  <path d="M47 222c12-42 43-65 81-65s69 23 81 65c-22 20-50 31-81 31s-59-11-81-31z" fill="url(#shirt)"/>
+  <path d="M84 101c0-28 19-51 44-51s44 23 44 51-20 54-44 54-44-24-44-54z" fill="#f8d7bd"/>
+  <path d="M84 104c7-26 22-42 44-42 19 0 34 11 42 32-11-6-23-10-37-10-19 0-35 7-49 20z" fill="#172033"/>
+  <path d="M92 114c5 18 18 31 36 31s31-13 36-31c-7 23-20 38-36 38s-29-15-36-38z" fill="#e8b68f" opacity="0.55"/>
+  <circle cx="112" cy="108" r="4" fill="#172033"/>
+  <circle cx="144" cy="108" r="4" fill="#172033"/>
+  <path d="M114 130c9 7 19 7 28 0" fill="none" stroke="#9f5f45" stroke-width="5" stroke-linecap="round"/>
+  <path d="M82 181c13 18 28 27 46 27s33-9 46-27" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">Twig Components demo image</title>
+  <desc id="desc">Abstract local demo image for a Twig Components carousel slide.</desc>
+  <rect width="1200" height="640" fill="#020617"/>
+  <rect x="126" y="82" width="948" height="476" rx="28" fill="#0f172a"/>
+  <path d="M194 190 H566 M194 260 H472 M194 330 H620 M194 400 H514" stroke="#94a3b8" stroke-width="26" stroke-linecap="round"/>
+  <rect x="724" y="154" width="226" height="332" rx="24" fill="#0e7490"/>
+  <rect x="766" y="206" width="142" height="22" rx="11" fill="#ecfeff" opacity=".9"/>
+  <rect x="766" y="266" width="112" height="18" rx="9" fill="#bae6fd" opacity=".75"/>
+  <rect x="766" y="310" width="132" height="18" rx="9" fill="#bae6fd" opacity=".75"/>
+  <rect x="766" y="392" width="86" height="44" rx="14" fill="#2563eb"/>
+  <circle cx="950" cy="146" r="110" fill="#38bdf8" opacity=".18"/>
+  <circle cx="742" cy="510" r="132" fill="#22c55e" opacity=".12"/>
+</svg>
