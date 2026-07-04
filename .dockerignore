@@ -1,0 +1,11 @@
+.git
+vendor
+node_modules
+demo/vendor
+demo/node_modules
+demo/var
+var
+.phpunit.cache
+demo/.phpunit.cache
+docs
+.claude

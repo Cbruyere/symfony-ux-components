@@ -1,0 +1,129 @@
+name: Build and deploy
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: deploy-ux-components-demo
+  cancel-in-progress: false
+
+env:
+  REGISTRY: registry.chrisdeveloppement.ovh
+  IMAGE_NAME: ux-components-demo
+  GITOPS_REPOSITORY: Cbruyere/k8s-deploy
+  GITOPS_VALUES_FILE: values/apps/ux-components-demo/app.yaml
+
+jobs:
+  build-and-update-gitops:
+    name: Build image and update GitOps tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout ux-components
+        uses: actions/checkout@v4
+
+      - name: Compute image tag
+        shell: bash
+        run: |
+          image_tag="${GITHUB_REF_NAME#v}"
+
+          if [ -z "$image_tag" ] || [ "$image_tag" = "$GITHUB_REF_NAME" ]; then
+            echo "Expected a Git tag starting with v, got: $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+
+          echo "IMAGE_TAG=$image_tag" >> "$GITHUB_ENV"
+
+      - name: Login to platform registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL
+
+      - name: Push image
+        shell: bash
+        run: docker push "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GITOPS_REPOSITORY }}
+          ref: main
+          token: ${{ secrets.K8S_DEPLOY_TOKEN }}
+          path: k8s-deploy
+
+      - name: Update ux-components-demo image tag
+        working-directory: k8s-deploy
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["GITOPS_VALUES_FILE"])
+          image_tag = os.environ["IMAGE_TAG"]
+          lines = path.read_text().splitlines()
+
+          in_image = False
+          updated = False
+          next_lines = []
+
+          for line in lines:
+              stripped = line.strip()
+
+              if line == "image:":
+                  in_image = True
+                  next_lines.append(line)
+                  continue
+
+              if in_image and line and not line.startswith(" "):
+                  in_image = False
+
+              if in_image and stripped.startswith("tag:"):
+                  indent = line[: len(line) - len(line.lstrip())]
+                  next_lines.append(f'{indent}tag: "{image_tag}"')
+                  updated = True
+                  continue
+
+              next_lines.append(line)
+
+          if not updated:
+              raise SystemExit(f"Could not find image.tag in {path}")
+
+          path.write_text("\n".join(next_lines) + "\n")
+          PY
+
+          git diff -- "$GITOPS_VALUES_FILE"
+
+          if git diff --quiet -- "$GITOPS_VALUES_FILE"; then
+            echo "GitOps values already use image tag ${IMAGE_TAG}; nothing to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$GITOPS_VALUES_FILE"
+          git commit -m "deploy(ux-components-demo): update image to ${IMAGE_TAG}"
+          git push origin main
