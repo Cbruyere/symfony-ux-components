@@ -3,12 +3,27 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class DemoController extends AbstractController
 {
+    #[Route('/users/{id}', name: 'user_show', requirements: ['id' => '\d+'])]
+    public function showUser(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $user = $entityManager->getRepository(User::class)->find($id);
+
+        if (!$user instanceof User) {
+            throw $this->createNotFoundException('Utilisateur introuvable.');
+        }
+
+        return $this->render('demo/user_show.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
@@ -77,16 +92,18 @@ final class DemoController extends AbstractController
                 [
                     'name' => 'view',
                     'label' => 'Voir',
-                    'route' => 'app_home',
+                    'route' => 'user_show',
                     'icon' => 'bi:eye',
                     'variant' => 'secondary',
+                    'params' => ['id' => 'id'],
                 ],
                 [
                     'name' => 'edit',
                     'label' => 'Modifier',
-                    'route' => 'app_home',
+                    'route' => 'user_show',
                     'icon' => 'bi:pencil',
                     'variant' => 'primary',
+                    'params' => ['id' => 'id'],
                 ],
             ],
             'filters' => [

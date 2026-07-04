@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user.prenom }} {{ user.nom }}
+{% endblock %}
+
+{% block body %}
+	<section class="mx-auto grid w-full max-w-2xl gap-6 px-6 py-8">
+		<a href="{{ path('app_home') }}" class="text-sm text-blue-400 hover:text-blue-300">&larr; Retour</a>
+
+		<div class="rounded-xl border border-slate-800 bg-slate-900 p-6">
+			<h1 class="text-2xl font-semibold text-white">{{ user.prenom }} {{ user.nom }}</h1>
+			<dl class="mt-4 space-y-3 text-sm">
+				<div class="flex justify-between border-b border-slate-800 pb-2">
+					<dt class="text-slate-400">Email</dt>
+					<dd class="text-slate-100">{{ user.email }}</dd>
+				</div>
+				<div class="flex justify-between border-b border-slate-800 pb-2">
+					<dt class="text-slate-400">Rôles</dt>
+					<dd class="text-slate-100">{{ user.roles|join(', ') }}</dd>
+				</div>
+				<div class="flex justify-between">
+					<dt class="text-slate-400">Identifiant</dt>
+					<dd class="text-slate-100">#{{ user.id }}</dd>
+				</div>
+			</dl>
+		</div>
+	</section>
+{% endblock %}
