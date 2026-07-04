@@ -5,7 +5,7 @@ namespace ChrisDev\UxComponents\Twig\Components;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent(
-    name: 'Card',
+    name: 'UxCard',
     template: '@ChrisDevUxComponents/components/Card.html.twig'
 )]
 final class Card

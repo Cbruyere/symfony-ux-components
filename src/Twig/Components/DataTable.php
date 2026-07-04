@@ -14,7 +14,7 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 
 #[AsLiveComponent(
-    name: 'DataTable',
+    name: 'UxDataTable',
     template: '@ChrisDevUxComponents/components/DataTable.html.twig'
 )]
 final class DataTable

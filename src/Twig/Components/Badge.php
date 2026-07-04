@@ -5,7 +5,7 @@ namespace ChrisDev\UxComponents\Twig\Components;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent(
-    name: 'Badge',
+    name: 'UxBadge',
     template: '@ChrisDevUxComponents/components/Badge.html.twig'
 )]
 final class Badge

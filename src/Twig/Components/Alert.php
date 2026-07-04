@@ -5,7 +5,7 @@ namespace ChrisDev\UxComponents\Twig\Components;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent(
-    name: 'Alert',
+    name: 'UxAlert',
     template: '@ChrisDevUxComponents/components/Alert.html.twig'
 )]
 final class Alert

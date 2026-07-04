@@ -4,5 +4,6 @@ services:
     exclude:
       - '../src/DependencyInjection/'
       - '../src/ChrisDevUxComponentsBundle.php'
+      - '../src/DataTable/DataSource/DoctrineDataSource.php'
     autowire: true
     autoconfigure: true

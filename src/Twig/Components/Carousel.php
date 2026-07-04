@@ -5,7 +5,7 @@ namespace ChrisDev\UxComponents\Twig\Components;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent(
-    name: 'Carousel',
+    name: 'UxCarousel',
     template: '@ChrisDevUxComponents/components/Carousel.html.twig'
 )]
 final class Carousel

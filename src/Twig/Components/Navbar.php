@@ -3,18 +3,33 @@
 namespace ChrisDev\UxComponents\Twig\Components;
 
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
 #[AsTwigComponent(
-    name: 'Navbar',
+    name: 'UxNavbar',
     template: '@ChrisDevUxComponents/components/Navbar.html.twig'
 )]
 final class Navbar
 {
+    /**
+     * @param array{label: string, route: string, logo: string} $brand
+     * @param list<array{label: string, route: string, icon: string, authenticated?: bool}> $items
+     * @param array{logged_in: array{label: string, route: string, icon: string}, logged_out: array{label: string, route: string, icon: string}} $userItems
+     */
     public function __construct(
         private readonly RequestStack $requestStack,
-        private readonly Security $security,
+        private readonly ?Security $security = null,
+        #[Autowire(param: 'chris_dev_ux_components.navbar.brand')]
+        private readonly array $brand = ['label' => 'Symfony Ux Starter Kit', 'route' => 'app_home', 'logo' => 'bi:boxes'],
+        #[Autowire(param: 'chris_dev_ux_components.navbar.items')]
+        private readonly array $items = [],
+        #[Autowire(param: 'chris_dev_ux_components.navbar.user_items')]
+        private readonly array $userItems = [
+            'logged_in' => ['label' => 'Logout', 'route' => 'app_logout', 'icon' => 'bi:box-arrow-right'],
+            'logged_out' => ['label' => 'Login', 'route' => 'app_login', 'icon' => 'bi:box-arrow-in-right'],
+        ],
     ) {
     }
 
@@ -23,11 +38,7 @@ final class Navbar
      */
     public function getBrand(): array
     {
-        return [
-            'label' => 'Symfony Ux Starter Kit',
-            'route' => 'app_home',
-            'logo' => 'bi:boxes',
-        ];
+        return $this->brand;
     }
 
     /**
@@ -35,19 +46,7 @@ final class Navbar
      */
     public function getItems(): array
     {
-        return [
-            [
-                'label' => 'Accueil',
-                'route' => 'app_home',
-                'icon' => 'bi:house',
-            ],
-            [
-                'label' => 'Compte',
-                'route' => 'app_account',
-                'icon' => 'bi:person',
-                'authenticated' => true,
-            ],
-        ];
+        return $this->items;
     }
 
     /**
@@ -55,23 +54,14 @@ final class Navbar
      */
     public function getUserItems(): array
     {
-        if ($this->isAuthenticated()) {
-            return [
-                [
-                    'label' => 'Logout',
-                    'route' => 'app_logout',
-                    'icon' => 'bi:box-arrow-right',
-                    'authenticated' => true,
-                ],
-            ];
-        }
+        $userItem = $this->isAuthenticated() ? $this->userItems['logged_in'] : $this->userItems['logged_out'];
 
         return [
             [
-                'label' => 'Login',
-                'route' => 'app_login',
-                'icon' => 'bi:box-arrow-in-right',
-                'authenticated' => false,
+                'label' => $userItem['label'],
+                'route' => $userItem['route'],
+                'icon' => $userItem['icon'],
+                'authenticated' => $this->isAuthenticated(),
             ],
         ];
     }
@@ -116,6 +106,6 @@ final class Navbar
 
     private function isAuthenticated(): bool
     {
-        return $this->security->getUser() !== null;
+        return $this->security?->getUser() !== null;
     }
 }

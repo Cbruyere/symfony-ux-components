@@ -1,0 +1,4 @@
+services:
+  ChrisDev\UxComponents\DataTable\DataSource\DoctrineDataSource:
+    autowire: true
+    autoconfigure: true
