@@ -105,8 +105,20 @@ final class NavbarTest extends TestCase
     {
         $navbar = $this->createNavbar($this->requestStackWithRoute('app_home'));
 
-        self::assertStringContainsString('bg-slate-800', $navbar->getLinkClasses('app_home'));
-        self::assertStringNotContainsString('bg-slate-800', $navbar->getLinkClasses('app_account'));
+        self::assertStringContainsString('bg-blue-600/15', $navbar->getLinkClasses('app_home'));
+        self::assertStringContainsString('ring-blue-500/30', $navbar->getLinkClasses('app_home'));
+        self::assertStringContainsString('border-transparent', $navbar->getLinkClasses('app_account'));
+        self::assertStringNotContainsString('bg-blue-600/15', $navbar->getLinkClasses('app_account'));
+    }
+
+    public function testGetMobileLinkClassesReflectsActiveState(): void
+    {
+        $navbar = $this->createNavbar($this->requestStackWithRoute('app_home'));
+
+        self::assertStringContainsString('bg-blue-600/15', $navbar->getMobileLinkClasses('app_home'));
+        self::assertStringContainsString('ring-blue-500/30', $navbar->getMobileLinkClasses('app_home'));
+        self::assertStringContainsString('border-transparent', $navbar->getMobileLinkClasses('app_account'));
+        self::assertStringNotContainsString('bg-blue-600/15', $navbar->getMobileLinkClasses('app_account'));
     }
 
     private function requestStackWithRoute(string $route): RequestStack

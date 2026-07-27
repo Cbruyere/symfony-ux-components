@@ -93,19 +93,19 @@ final class Navbar
     public function getLinkClasses(string $route): string
     {
         if ($this->isActive($route)) {
-            return 'inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white';
+            return 'inline-flex items-center gap-2 rounded-lg border border-blue-500/40 bg-blue-600/15 px-3 py-2 text-sm font-semibold text-blue-100 shadow-sm shadow-blue-950/30 ring-1 ring-blue-500/30';
         }
 
-        return 'inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-white';
+        return 'inline-flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-white';
     }
 
     public function getMobileLinkClasses(string $route): string
     {
         if ($this->isActive($route)) {
-            return 'flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-white';
+            return 'flex items-center gap-2 rounded-lg border border-blue-500/40 bg-blue-600/15 px-3 py-2 text-sm font-semibold text-blue-100 shadow-sm shadow-blue-950/30 ring-1 ring-blue-500/30';
         }
 
-        return 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-white';
+        return 'flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-900 hover:text-white';
     }
 
     private function getCurrentRoute(): ?string
