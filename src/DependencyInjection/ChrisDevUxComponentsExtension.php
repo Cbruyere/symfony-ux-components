@@ -21,7 +21,7 @@ final class ChrisDevUxComponentsExtension extends ConfigurableExtension
     }
 
     /**
-     * @param array{navbar: array{brand: array<string, mixed>, items: list<array<string, mixed>>, user_items: array<string, mixed>}} $mergedConfig
+     * @param array{navbar: array{brand: array<string, mixed>, items: list<array<string, mixed>>, user_items?: array<string, mixed>}} $mergedConfig
      */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -38,6 +38,12 @@ final class ChrisDevUxComponentsExtension extends ConfigurableExtension
 
         $container->setParameter('chris_dev_ux_components.navbar.brand', $mergedConfig['navbar']['brand']);
         $container->setParameter('chris_dev_ux_components.navbar.items', $mergedConfig['navbar']['items']);
-        $container->setParameter('chris_dev_ux_components.navbar.user_items', $mergedConfig['navbar']['user_items']);
+        $container->setParameter(
+            'chris_dev_ux_components.navbar.user_items',
+            $mergedConfig['navbar']['user_items'] ?? [
+                'logged_in' => ['label' => 'Logout', 'route' => 'app_logout', 'icon' => 'bi:box-arrow-right'],
+                'logged_out' => ['label' => 'Login', 'route' => 'app_login', 'icon' => 'bi:box-arrow-in-right'],
+            ],
+        );
     }
 }

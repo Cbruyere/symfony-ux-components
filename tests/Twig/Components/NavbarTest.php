@@ -41,6 +41,42 @@ final class NavbarTest extends TestCase
         self::assertSame('Logout', $navbar->getUserItems()[0]['label']);
     }
 
+    public function testMissingLoggedOutUserItemReturnsNoUserItem(): void
+    {
+        $navbar = new Navbar(
+            $this->requestStackWithRoute('app_home'),
+            null,
+            userItems: ['logged_in' => ['label' => 'Logout', 'route' => 'app_logout', 'icon' => 'bi:box-arrow-right']],
+        );
+
+        self::assertSame([], $navbar->getUserItems());
+    }
+
+    public function testMissingLoggedInUserItemReturnsNoUserItem(): void
+    {
+        $security = $this->createMock(Security::class);
+        $security->method('getUser')->willReturn($this->createMock(UserInterface::class));
+
+        $navbar = new Navbar(
+            $this->requestStackWithRoute('app_home'),
+            $security,
+            userItems: ['logged_out' => ['label' => 'Login', 'route' => 'app_login', 'icon' => 'bi:box-arrow-in-right']],
+        );
+
+        self::assertSame([], $navbar->getUserItems());
+    }
+
+    public function testEmptyUserItemsReturnsNoUserItem(): void
+    {
+        $navbar = new Navbar(
+            $this->requestStackWithRoute('app_home'),
+            null,
+            userItems: [],
+        );
+
+        self::assertSame([], $navbar->getUserItems());
+    }
+
     public function testCustomConfigurationIsExposed(): void
     {
         $navbar = new Navbar(

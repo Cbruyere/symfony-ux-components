@@ -1504,14 +1504,14 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *         user_items?: array{
  *             logged_in?: array{
- *                 label?: scalar|Param|null, // Default: "Logout"
- *                 route?: scalar|Param|null, // Default: "app_logout"
- *                 icon?: scalar|Param|null, // Default: "bi:box-arrow-right"
+ *                 label?: scalar|Param|null,
+ *                 route?: scalar|Param|null,
+ *                 icon?: scalar|Param|null,
  *             },
  *             logged_out?: array{
- *                 label?: scalar|Param|null, // Default: "Login"
- *                 route?: scalar|Param|null, // Default: "app_login"
- *                 icon?: scalar|Param|null, // Default: "bi:box-arrow-in-right"
+ *                 label?: scalar|Param|null,
+ *                 route?: scalar|Param|null,
+ *                 icon?: scalar|Param|null,
  *             },
  *         },
  *     },

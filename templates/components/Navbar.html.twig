@@ -8,7 +8,7 @@
 
             <button
                 type="button"
-                class="hs-collapse-toggle inline-flex size-10 items-center justify-center rounded-lg border border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-white focus:outline-hidden sm:hidden"
+                class="hs-collapse-toggle inline-flex size-10 items-center justify-center rounded-lg border border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-white focus:outline-hidden sm:!hidden"
                 data-hs-collapse="#main-navbar"
                 aria-controls="main-navbar"
                 aria-expanded="false"
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <div id="main-navbar" class="hs-collapse hidden overflow-hidden transition-all duration-300 sm:hidden">
+        <div id="main-navbar" class="hs-collapse hidden overflow-hidden transition-all duration-300 sm:!hidden">
             <div class="space-y-1 pb-4">
                 {% for item in this.items %}
                     {% if this.visible(item) %}
