@@ -16,7 +16,7 @@ final class Navbar
     /**
      * @param array{label: string, route: string, logo: string} $brand
      * @param list<array{label: string, route: string, icon: string, authenticated?: bool}> $items
-     * @param array{logged_in?: array{label: string, route: string, icon: string}, logged_out?: array{label: string, route: string, icon: string}} $userItems
+     * @param array{logged_in?: array<string, mixed>, logged_out?: array<string, mixed>} $userItems
      */
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -57,7 +57,13 @@ final class Navbar
         $key = $this->isAuthenticated() ? 'logged_in' : 'logged_out';
         $userItem = $this->userItems[$key] ?? null;
 
-        if ($userItem === null) {
+        if (
+            !is_array($userItem)
+            || !isset($userItem['label'], $userItem['route'], $userItem['icon'])
+            || !is_string($userItem['label'])
+            || !is_string($userItem['route'])
+            || !is_string($userItem['icon'])
+        ) {
             return [];
         }
 

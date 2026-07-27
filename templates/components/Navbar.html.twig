@@ -1,4 +1,13 @@
 <nav class="border-b border-slate-800 bg-slate-950/95" data-component="navbar">
+    <style>
+        @media (min-width: 640px) {
+            [data-component="navbar"] [data-navbar-collapse-toggle],
+            [data-component="navbar"] [data-navbar-collapse-panel] {
+                display: none !important;
+            }
+        }
+    </style>
+
     <div class="mx-auto max-w-6xl px-6">
         <div class="flex min-h-16 items-center justify-between gap-4">
             <a class="flex items-center gap-2 font-semibold text-white" href="{{ path(this.brand.route) }}">
@@ -13,6 +22,7 @@
                 aria-controls="main-navbar"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
+                data-navbar-collapse-toggle
             >
                 {{ ux_icon('bi:list', {class: 'size-5 hs-collapse-open:hidden'}) }}
                 {{ ux_icon('bi:x-lg', {class: 'hidden size-5 hs-collapse-open:block'}) }}
@@ -45,7 +55,7 @@
             </div>
         </div>
 
-        <div id="main-navbar" class="hs-collapse hidden overflow-hidden transition-all duration-300 sm:!hidden">
+        <div id="main-navbar" class="hs-collapse hidden overflow-hidden transition-all duration-300 sm:!hidden" data-navbar-collapse-panel>
             <div class="space-y-1 pb-4">
                 {% for item in this.items %}
                     {% if this.visible(item) %}

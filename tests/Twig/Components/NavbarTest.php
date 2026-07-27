@@ -77,6 +77,17 @@ final class NavbarTest extends TestCase
         self::assertSame([], $navbar->getUserItems());
     }
 
+    public function testIncompleteUserItemReturnsNoUserItem(): void
+    {
+        $navbar = new Navbar(
+            $this->requestStackWithRoute('app_home'),
+            null,
+            userItems: ['logged_out' => ['route' => 'app_login', 'icon' => 'bi:box-arrow-in-right']],
+        );
+
+        self::assertSame([], $navbar->getUserItems());
+    }
+
     public function testCustomConfigurationIsExposed(): void
     {
         $navbar = new Navbar(
